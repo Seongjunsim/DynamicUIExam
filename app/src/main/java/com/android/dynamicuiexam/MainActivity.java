@@ -9,21 +9,30 @@ public class MainActivity extends AppCompatActivity implements HeadlinesFragment
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if(savedInstanceState == null){
-            HeadlinesFragment headlinesFragment = new HeadlinesFragment();
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, headlinesFragment).commit();
+        if(findViewById(R.id.fragment_container)!= null){
+            if(savedInstanceState == null){
+                HeadlinesFragment headlinesFragment = new HeadlinesFragment();
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.fragment_container, headlinesFragment).commit();
+            }
         }
+
     }
 
     @Override
     public void onHeadlineSeleceted(int position){
-        ArticleFragment articleFragment = new ArticleFragment();
+        ArticleFragment articleFragment = (ArticleFragment) getSupportFragmentManager().findFragmentById(R.id.article_fragment);
+        if(articleFragment == null){
+            ArticleFragment newArticleFragment = new ArticleFragment();
+            Bundle args = new Bundle();
+            args.putInt(newArticleFragment.ARG_POSITION, position);
+            articleFragment.setArguments(args);
 
-        Bundle args = new Bundle();
-        args.putInt(ArticleFragment.ARG_POSITION, position);
-        articleFragment.setArguments(args);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, newArticleFragment).addToBackStack(null).commit();
+        }else{
+            articleFragment.updateArticleView(position);
+        }
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, articleFragment).addToBackStack(null).commit();
+
     }
 }
